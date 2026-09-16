@@ -2,7 +2,8 @@
 // BUSINESS ID
 // =========================
 
-let businessId = localStorage.getItem("businessId");
+let businessId =
+    localStorage.getItem("businessId");
 
 
 // =========================
@@ -25,7 +26,7 @@ const nextButton =
 
 function showSetupPage() {
 
-    setupPage.style.display = "block";
+    setupPage.style.display = "flex";
 
     dashboardPage.style.display = "none";
 
@@ -60,14 +61,12 @@ async function checkBusiness() {
 
     }
 
-
     try {
 
         const response =
             await fetch(
                 `/api/business/${businessId}`
             );
-
 
         // Business doesn't exist
         if (!response.ok) {
@@ -84,17 +83,14 @@ async function checkBusiness() {
 
         }
 
-
         const business =
             await response.json();
-
 
         displayBusiness(business);
 
         showDashboardPage();
 
-        loadDashboard();
-
+        await loadDashboard();
 
     } catch (error) {
 
@@ -125,18 +121,20 @@ if (nextButton) {
                     "companyName"
                 ).value.trim();
 
-
             const businessType =
                 document.getElementById(
                     "businessType"
                 ).value;
-
 
             const ownerName =
                 document.getElementById(
                     "ownerName"
                 ).value.trim();
 
+
+            // =========================
+            // VALIDATION
+            // =========================
 
             if (!companyName) {
 
@@ -171,6 +169,10 @@ if (nextButton) {
             }
 
 
+            // =========================
+            // CREATE BUSINESS
+            // =========================
+
             try {
 
                 nextButton.disabled = true;
@@ -191,15 +193,10 @@ if (nextButton) {
                             },
 
                             body: JSON.stringify({
-
                                 companyName,
-
                                 businessType,
-
                                 ownerName
-
                             })
-
                         }
                     );
 
@@ -225,22 +222,33 @@ if (nextButton) {
                 }
 
 
-                // Save the unique business ID
+                // =========================
+                // SAVE BUSINESS ID
+                // =========================
+
                 localStorage.setItem(
                     "businessId",
                     data.businessId
                 );
 
-
                 businessId =
                     data.businessId;
 
 
+                // =========================
+                // DISPLAY BUSINESS
+                // =========================
+
                 displayBusiness(data);
+
+
+                // =========================
+                // OPEN DASHBOARD
+                // =========================
 
                 showDashboardPage();
 
-                loadDashboard();
+                await loadDashboard();
 
 
             } catch (error) {
@@ -278,7 +286,6 @@ function displayBusiness(business) {
         document.getElementById(
             "businessName"
         );
-
 
     const welcomeElement =
         document.getElementById(
@@ -344,32 +351,85 @@ async function loadSummary() {
             );
 
 
+        if (!response.ok) {
+
+            console.error(
+                "Failed to load summary."
+            );
+
+            return;
+
+        }
+
+
         const data =
             await response.json();
 
 
-        document.getElementById(
-            "totalIncome"
-        ).textContent =
-            `₹${Number(data.income).toFixed(2)}`;
+        const income =
+            Number(data.income) || 0;
+
+        const expenses =
+            Number(data.expenses) || 0;
+
+        const profit =
+            Number(data.profit) || 0;
+
+        const profitMargin =
+            Number(data.profitMargin) || 0;
 
 
-        document.getElementById(
-            "totalExpenses"
-        ).textContent =
-            `₹${Number(data.expenses).toFixed(2)}`;
+        const totalIncomeElement =
+            document.getElementById(
+                "totalIncome"
+            );
+
+        const totalExpensesElement =
+            document.getElementById(
+                "totalExpenses"
+            );
+
+        const totalProfitElement =
+            document.getElementById(
+                "totalProfit"
+            );
+
+        const profitMarginElement =
+            document.getElementById(
+                "profitMargin"
+            );
 
 
-        document.getElementById(
-            "totalProfit"
-        ).textContent =
-            `₹${Number(data.profit).toFixed(2)}`;
+        if (totalIncomeElement) {
+
+            totalIncomeElement.textContent =
+                `₹${income.toFixed(2)}`;
+
+        }
 
 
-        document.getElementById(
-            "profitMargin"
-        ).textContent =
-            `${Number(data.profitMargin).toFixed(1)}%`;
+        if (totalExpensesElement) {
+
+            totalExpensesElement.textContent =
+                `₹${expenses.toFixed(2)}`;
+
+        }
+
+
+        if (totalProfitElement) {
+
+            totalProfitElement.textContent =
+                `₹${profit.toFixed(2)}`;
+
+        }
+
+
+        if (profitMarginElement) {
+
+            profitMarginElement.textContent =
+                `${profitMargin.toFixed(1)}%`;
+
+        }
 
 
     } catch (error) {
@@ -398,6 +458,17 @@ async function loadTransactions() {
             );
 
 
+        if (!response.ok) {
+
+            console.error(
+                "Failed to load transactions."
+            );
+
+            return;
+
+        }
+
+
         const transactions =
             await response.json();
 
@@ -415,6 +486,15 @@ async function loadTransactions() {
         }
 
 
+        // Clear previous transactions
+
+        container.innerHTML = "";
+
+
+        // =========================
+        // NO TRANSACTIONS
+        // =========================
+
         if (
             !transactions ||
             transactions.length === 0
@@ -431,62 +511,178 @@ async function loadTransactions() {
         }
 
 
-        container.innerHTML =
-            transactions.map(
-                transaction => {
+        // =========================
+        // CREATE TRANSACTION ROWS
+        // =========================
 
-                    const amount =
-                        Number(
-                            transaction.amount
-                        ).toFixed(2);
+        transactions.forEach(
+            transaction => {
 
-
-                    const type =
-                        transaction.type;
-
-
-                    const sign =
-                        type === "income"
-                            ? "+"
-                            : "-";
+                const row =
+                    document.createElement(
+                        "div"
+                    );
 
 
-                    return `
+                // IMPORTANT:
+                // This matches the CSS grid
 
-                        <div class="transaction-item">
+                row.className =
+                    "transaction-item";
 
-                            <div>
-                                ${type}
-                            </div>
 
-                            <div>
-                                ${transaction.category}
-                            </div>
+                const typeElement =
+                    document.createElement(
+                        "div"
+                    );
 
-                            <div class="${type}">
-                                ${sign}₹${amount}
-                            </div>
+                const categoryElement =
+                    document.createElement(
+                        "div"
+                    );
 
-                            <div>
-                                ${transaction.date}
-                            </div>
+                const amountElement =
+                    document.createElement(
+                        "div"
+                    );
 
-                            <div>
+                const dateElement =
+                    document.createElement(
+                        "div"
+                    );
 
-                                <button
-                                    onclick="deleteTransaction(${transaction.id})"
-                                >
-                                    Delete
-                                </button>
+                const actionElement =
+                    document.createElement(
+                        "div"
+                    );
 
-                            </div>
 
-                        </div>
+                // =========================
+                // TYPE
+                // =========================
 
-                    `;
+                typeElement.textContent =
+                    transaction.type;
 
-                }
-            ).join("");
+
+                // Add income / expense color
+
+                typeElement.classList.add(
+                    transaction.type
+                );
+
+
+                // =========================
+                // CATEGORY
+                // =========================
+
+                categoryElement.textContent =
+                    transaction.category;
+
+
+                // =========================
+                // AMOUNT
+                // =========================
+
+                const amount =
+                    Number(
+                        transaction.amount
+                    ) || 0;
+
+
+                const sign =
+                    transaction.type === "income"
+                        ? "+"
+                        : "-";
+
+
+                amountElement.textContent =
+                    `${sign}₹${amount.toFixed(2)}`;
+
+
+                amountElement.classList.add(
+                    transaction.type
+                );
+
+
+                // =========================
+                // DATE
+                // =========================
+
+                dateElement.textContent =
+                    transaction.date;
+
+
+                // =========================
+                // DELETE BUTTON
+                // =========================
+
+                const deleteButton =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                deleteButton.textContent =
+                    "Delete";
+
+
+                deleteButton.className =
+                    "delete-button";
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    function () {
+
+                        deleteTransaction(
+                            transaction.id
+                        );
+
+                    }
+                );
+
+
+                // Put button inside action column
+
+                actionElement.appendChild(
+                    deleteButton
+                );
+
+
+                // =========================
+                // ADD ALL COLUMNS TO ROW
+                // =========================
+
+                row.appendChild(
+                    typeElement
+                );
+
+                row.appendChild(
+                    categoryElement
+                );
+
+                row.appendChild(
+                    amountElement
+                );
+
+                row.appendChild(
+                    dateElement
+                );
+
+                row.appendChild(
+                    actionElement
+                );
+
+
+                // Add row to transaction list
+
+                container.appendChild(
+                    row
+                );
+
+            }
+        );
 
 
     } catch (error) {
@@ -520,6 +716,10 @@ if (transactionForm) {
             event.preventDefault();
 
 
+            // =========================
+            // CHECK BUSINESS
+            // =========================
+
             if (!businessId) {
 
                 alert(
@@ -530,6 +730,10 @@ if (transactionForm) {
 
             }
 
+
+            // =========================
+            // GET FORM VALUES
+            // =========================
 
             const type =
                 document.getElementById(
@@ -561,6 +765,10 @@ if (transactionForm) {
                 ).value;
 
 
+            // =========================
+            // VALIDATION
+            // =========================
+
             if (
                 !category ||
                 !amount ||
@@ -575,6 +783,23 @@ if (transactionForm) {
 
             }
 
+
+            if (
+                Number(amount) <= 0
+            ) {
+
+                alert(
+                    "Amount must be greater than zero."
+                );
+
+                return;
+
+            }
+
+
+            // =========================
+            // SAVE TRANSACTION
+            // =========================
 
             try {
 
@@ -591,17 +816,29 @@ if (transactionForm) {
 
                             body: JSON.stringify({
 
-                                businessId,
+                                businessId:
 
-                                type,
+                                    businessId,
 
-                                category,
+                                type:
 
-                                amount,
+                                    type,
 
-                                description,
+                                category:
 
-                                date
+                                    category,
+
+                                amount:
+
+                                    amount,
+
+                                description:
+
+                                    description,
+
+                                date:
+
+                                    date
 
                             })
 
@@ -625,10 +862,18 @@ if (transactionForm) {
                 }
 
 
+                // =========================
+                // RESET FORM
+                // =========================
+
                 transactionForm.reset();
 
 
-                loadDashboard();
+                // =========================
+                // RELOAD DASHBOARD
+                // =========================
+
+                await loadDashboard();
 
 
             } catch (error) {
@@ -698,7 +943,9 @@ async function deleteTransaction(
         }
 
 
-        loadDashboard();
+        // Reload dashboard
+
+        await loadDashboard();
 
 
     } catch (error) {
@@ -706,6 +953,10 @@ async function deleteTransaction(
         console.error(
             "Delete error:",
             error
+        );
+
+        alert(
+            "Something went wrong while deleting the transaction."
         );
 
     }
@@ -728,6 +979,17 @@ async function loadAnalytics() {
             await fetch(
                 `/api/analytics/weekly/${businessId}`
             );
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Failed to load analytics."
+            );
+
+            return;
+
+        }
 
 
         const data =
@@ -755,16 +1017,27 @@ async function loadAnalytics() {
 
         const profits =
             data.map(
-                item => item.profit
+                item =>
+                    Number(item.profit) || 0
             );
 
+
+        // =========================
+        // DESTROY OLD CHART
+        // =========================
 
         if (weeklyChart) {
 
             weeklyChart.destroy();
 
+            weeklyChart = null;
+
         }
 
+
+        // =========================
+        // CREATE CHART
+        // =========================
 
         weeklyChart =
             new Chart(
@@ -801,7 +1074,8 @@ async function loadAnalytics() {
 
                     options: {
 
-                        responsive: true,
+                        responsive:
+                            true,
 
                         maintainAspectRatio:
                             false
@@ -838,6 +1112,13 @@ async function generateAdvice() {
             );
 
 
+        if (!response.ok) {
+
+            return;
+
+        }
+
+
         const data =
             await response.json();
 
@@ -856,23 +1137,27 @@ async function generateAdvice() {
 
 
         const income =
-            Number(data.income);
+            Number(data.income) || 0;
 
 
         const expenses =
-            Number(data.expenses);
+            Number(data.expenses) || 0;
 
 
         const profit =
-            Number(data.profit);
+            Number(data.profit) || 0;
 
 
         const margin =
-            Number(data.profitMargin);
+            Number(data.profitMargin) || 0;
 
 
         let advice = "";
 
+
+        // =========================
+        // NO DATA
+        // =========================
 
         if (
             income === 0 &&
@@ -884,26 +1169,52 @@ async function generateAdvice() {
 
         }
 
-        else if (profit < 0) {
+
+        // =========================
+        // LOSS
+        // =========================
+
+        else if (
+            profit < 0
+        ) {
 
             advice =
                 "Your business is currently spending more than it earns. Review your major expenses and look for areas where costs can be reduced.";
 
         }
 
-        else if (margin < 10) {
+
+        // =========================
+        // LOW MARGIN
+        // =========================
+
+        else if (
+            margin < 10
+        ) {
 
             advice =
                 "Your profit margin is currently below 10%. Keep an eye on expenses and look for ways to improve your revenue or reduce unnecessary costs.";
 
         }
 
-        else if (margin < 25) {
+
+        // =========================
+        // MEDIUM MARGIN
+        // =========================
+
+        else if (
+            margin < 25
+        ) {
 
             advice =
                 "Your business is generating a positive profit. Continue monitoring your expenses and look for opportunities to improve your profit margin.";
 
         }
+
+
+        // =========================
+        // HIGHER MARGIN
+        // =========================
 
         else {
 

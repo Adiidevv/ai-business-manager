@@ -16,6 +16,7 @@ body {
 
 .setup-page {
     min-height: 100vh;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,6 +36,7 @@ body {
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    margin: auto;
 }
 
 .setup-card h1 {
@@ -283,9 +285,20 @@ body {
     overflow-x: auto;
 }
 
+/*
+   IMPORTANT:
+   The HTML header uses .transaction-header
+   and app.js creates each transaction using
+   .transaction-item.
+
+   Both must use the SAME grid.
+*/
+
 .transaction-header,
-.transaction-row {
+.transaction-row,
+.transaction-item {
     display: grid;
+
     grid-template-columns:
         1fr
         1.5fr
@@ -295,34 +308,51 @@ body {
 
     gap: 15px;
     align-items: center;
+
     min-width: 700px;
 }
 
 .transaction-header {
     padding-bottom: 15px;
     border-bottom: 2px solid #e2e8f0;
+
     font-weight: 700;
     color: #475569;
 }
 
-.transaction-row {
+.transaction-row,
+.transaction-item {
     padding: 15px 0;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.transaction-row:last-child {
+.transaction-row:last-child,
+.transaction-item:last-child {
     border-bottom: none;
 }
+
+/* Keep transaction text inside its own column */
+
+.transaction-item > div,
+.transaction-row > div {
+    min-width: 0;
+}
+
+/* Income */
 
 .income {
     color: #16a34a;
     font-weight: 600;
 }
 
+/* Expense */
+
 .expense {
     color: #dc2626;
     font-weight: 600;
 }
+
+/* Delete button */
 
 .delete-button {
     padding: 7px 12px;
@@ -393,6 +423,10 @@ body {
 
 @media (max-width: 650px) {
 
+    .setup-page {
+        padding: 15px;
+    }
+
     .setup-card {
         padding: 30px 20px;
     }
@@ -424,6 +458,15 @@ body {
 
     .content-card {
         padding: 20px;
+    }
+
+    /*
+       Allow the transaction table to scroll
+       horizontally on small screens.
+    */
+
+    .transaction-card {
+        overflow-x: auto;
     }
 
 }
