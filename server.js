@@ -3,7 +3,9 @@ const db = require("./database");
 
 const app = express();
 
-const PORT = 3000;
+// Render provides PORT.
+// 3000 is used when running locally.
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -552,10 +554,11 @@ app.get(
 
 app.listen(
     PORT,
+    "0.0.0.0",
     () => {
 
         console.log(
-            `Server is running at http://localhost:${PORT}`
+            `Server is running on port ${PORT}`
         );
 
     }
