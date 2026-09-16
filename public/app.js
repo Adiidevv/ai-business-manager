@@ -7,6 +7,13 @@ let businessId =
 
 
 // =========================
+// SUMMARY VIEW
+// =========================
+
+let summaryView = "total";
+
+
+// =========================
 // PAGE ELEMENTS
 // =========================
 
@@ -18,6 +25,12 @@ const dashboardPage =
 
 const nextButton =
     document.getElementById("nextButton");
+
+const totalViewButton =
+    document.getElementById("totalViewButton");
+
+const todayViewButton =
+    document.getElementById("todayViewButton");
 
 
 // =========================
@@ -366,70 +379,7 @@ async function loadSummary() {
             await response.json();
 
 
-        const income =
-            Number(data.income) || 0;
-
-        const expenses =
-            Number(data.expenses) || 0;
-
-        const profit =
-            Number(data.profit) || 0;
-
-        const profitMargin =
-            Number(data.profitMargin) || 0;
-
-
-        const totalIncomeElement =
-            document.getElementById(
-                "totalIncome"
-            );
-
-        const totalExpensesElement =
-            document.getElementById(
-                "totalExpenses"
-            );
-
-        const totalProfitElement =
-            document.getElementById(
-                "totalProfit"
-            );
-
-        const profitMarginElement =
-            document.getElementById(
-                "profitMargin"
-            );
-
-
-        if (totalIncomeElement) {
-
-            totalIncomeElement.textContent =
-                `₹${income.toFixed(2)}`;
-
-        }
-
-
-        if (totalExpensesElement) {
-
-            totalExpensesElement.textContent =
-                `₹${expenses.toFixed(2)}`;
-
-        }
-
-
-        if (totalProfitElement) {
-
-            totalProfitElement.textContent =
-                `₹${profit.toFixed(2)}`;
-
-        }
-
-
-        if (profitMarginElement) {
-
-            profitMarginElement.textContent =
-                `${profitMargin.toFixed(1)}%`;
-
-        }
+        renderSummary(data);
 
 
     } catch (error) {
@@ -440,6 +390,254 @@ async function loadSummary() {
         );
 
     }
+
+}
+
+
+// =========================
+// RENDER SUMMARY
+// =========================
+
+function renderSummary(data) {
+
+    const incomeLabel =
+        document.getElementById(
+            "incomeLabel"
+        );
+
+    const expensesLabel =
+        document.getElementById(
+            "expensesLabel"
+        );
+
+    const profitLabel =
+        document.getElementById(
+            "profitLabel"
+        );
+
+    const marginLabel =
+        document.getElementById(
+            "marginLabel"
+        );
+
+
+    const totalIncomeElement =
+        document.getElementById(
+            "totalIncome"
+        );
+
+    const totalExpensesElement =
+        document.getElementById(
+            "totalExpenses"
+        );
+
+    const totalProfitElement =
+        document.getElementById(
+            "totalProfit"
+        );
+
+    const profitMarginElement =
+        document.getElementById(
+            "profitMargin"
+        );
+
+
+    let income;
+    let expenses;
+    let profit;
+    let profitMargin;
+
+
+    // =========================
+    // TOTAL VIEW
+    // =========================
+
+    if (summaryView === "total") {
+
+        income =
+            Number(data.income) || 0;
+
+        expenses =
+            Number(data.expenses) || 0;
+
+        profit =
+            Number(data.profit) || 0;
+
+        profitMargin =
+            Number(data.profitMargin) || 0;
+
+
+        if (incomeLabel) {
+
+            incomeLabel.textContent =
+                "Total Income";
+
+        }
+
+        if (expensesLabel) {
+
+            expensesLabel.textContent =
+                "Total Expenses";
+
+        }
+
+        if (profitLabel) {
+
+            profitLabel.textContent =
+                "Total Profit";
+
+        }
+
+        if (marginLabel) {
+
+            marginLabel.textContent =
+                "Total Profit Margin";
+
+        }
+
+    }
+
+
+    // =========================
+    // TODAY VIEW
+    // =========================
+
+    else {
+
+        income =
+            Number(data.todayIncome) || 0;
+
+        expenses =
+            Number(data.todayExpenses) || 0;
+
+        profit =
+            Number(data.todayProfit) || 0;
+
+        profitMargin =
+            Number(data.todayProfitMargin) || 0;
+
+
+        if (incomeLabel) {
+
+            incomeLabel.textContent =
+                "Today's Income";
+
+        }
+
+        if (expensesLabel) {
+
+            expensesLabel.textContent =
+                "Today's Expenses";
+
+        }
+
+        if (profitLabel) {
+
+            profitLabel.textContent =
+                "Today's Profit";
+
+        }
+
+        if (marginLabel) {
+
+            marginLabel.textContent =
+                "Today's Profit Margin";
+
+        }
+
+    }
+
+
+    // =========================
+    // DISPLAY VALUES
+    // =========================
+
+    if (totalIncomeElement) {
+
+        totalIncomeElement.textContent =
+            `₹${income.toFixed(2)}`;
+
+    }
+
+
+    if (totalExpensesElement) {
+
+        totalExpensesElement.textContent =
+            `₹${expenses.toFixed(2)}`;
+
+    }
+
+
+    if (totalProfitElement) {
+
+        totalProfitElement.textContent =
+            `₹${profit.toFixed(2)}`;
+
+    }
+
+
+    if (profitMarginElement) {
+
+        profitMarginElement.textContent =
+            `${profitMargin.toFixed(1)}%`;
+
+    }
+
+}
+
+
+// =========================
+// TOTAL / TODAY BUTTONS
+// =========================
+
+if (totalViewButton) {
+
+    totalViewButton.addEventListener(
+        "click",
+        async function () {
+
+            summaryView = "total";
+
+
+            totalViewButton.classList.add(
+                "active"
+            );
+
+            todayViewButton.classList.remove(
+                "active"
+            );
+
+
+            await loadSummary();
+
+        }
+    );
+
+}
+
+
+if (todayViewButton) {
+
+    todayViewButton.addEventListener(
+        "click",
+        async function () {
+
+            summaryView = "today";
+
+
+            todayViewButton.classList.add(
+                "active"
+            );
+
+            totalViewButton.classList.remove(
+                "active"
+            );
+
+
+            await loadSummary();
+
+        }
+    );
 
 }
 
@@ -524,9 +722,6 @@ async function loadTransactions() {
                     );
 
 
-                // IMPORTANT:
-                // This matches the CSS grid
-
                 row.className =
                     "transaction-item";
 
@@ -564,8 +759,6 @@ async function loadTransactions() {
                 typeElement.textContent =
                     transaction.type;
 
-
-                // Add income / expense color
 
                 typeElement.classList.add(
                     transaction.type
@@ -643,15 +836,13 @@ async function loadTransactions() {
                 );
 
 
-                // Put button inside action column
-
                 actionElement.appendChild(
                     deleteButton
                 );
 
 
                 // =========================
-                // ADD ALL COLUMNS TO ROW
+                // ADD ALL COLUMNS
                 // =========================
 
                 row.appendChild(
@@ -674,8 +865,6 @@ async function loadTransactions() {
                     actionElement
                 );
 
-
-                // Add row to transaction list
 
                 container.appendChild(
                     row
@@ -817,27 +1006,21 @@ if (transactionForm) {
                             body: JSON.stringify({
 
                                 businessId:
-
                                     businessId,
 
                                 type:
-
                                     type,
 
                                 category:
-
                                     category,
 
                                 amount:
-
                                     amount,
 
                                 description:
-
                                     description,
 
                                 date:
-
                                     date
 
                             })

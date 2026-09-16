@@ -1,29 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>AI Business Manager</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
+
 <body>
+
 
     <!-- =========================
          BUSINESS SETUP PAGE
     ========================== -->
 
-    <section id="setupPage" class="setup-page">
+    <section
+        id="setupPage"
+        class="setup-page"
+    >
 
         <div class="setup-card">
 
-            <h1>🤖 AI Business Manager</h1>
+            <h1>
+                🤖 AI Business Manager
+            </h1>
 
             <p class="setup-subtitle">
                 Let's set up your business
             </p>
+
 
             <div class="form-group">
 
@@ -38,6 +56,7 @@
                 >
 
             </div>
+
 
             <div class="form-group">
 
@@ -99,6 +118,7 @@
 
             </div>
 
+
             <div class="form-group">
 
                 <label for="ownerName">
@@ -113,7 +133,12 @@
 
             </div>
 
-            <p id="setupMessage" class="setup-message"></p>
+
+            <p
+                id="setupMessage"
+                class="setup-message"
+            ></p>
+
 
             <button
                 id="nextButton"
@@ -127,11 +152,16 @@
     </section>
 
 
+
     <!-- =========================
          BUSINESS MANAGER PAGE
     ========================== -->
 
-    <section id="dashboardPage" class="dashboard-page">
+    <section
+        id="dashboardPage"
+        class="dashboard-page"
+    >
+
 
         <!-- HEADER -->
 
@@ -152,6 +182,7 @@
         </header>
 
 
+
         <!-- MAIN CONTENT -->
 
         <main class="main-content">
@@ -162,6 +193,7 @@
             ========================== -->
 
             <section class="dashboard-section">
+
 
                 <div class="section-title">
 
@@ -176,11 +208,42 @@
                 </div>
 
 
+                <!-- =========================
+                     SUMMARY VIEW SWITCH
+                ========================== -->
+
+                <div class="summary-switch">
+
+                    <button
+                        id="totalViewButton"
+                        class="summary-view-button active"
+                        type="button"
+                    >
+                        Total
+                    </button>
+
+                    <button
+                        id="todayViewButton"
+                        class="summary-view-button"
+                        type="button"
+                    >
+                        Today
+                    </button>
+
+                </div>
+
+
+
+                <!-- =========================
+                     DASHBOARD CARDS
+                ========================== -->
+
                 <div class="dashboard-cards">
+
 
                     <div class="dashboard-card">
 
-                        <h3>
+                        <h3 id="incomeLabel">
                             Total Income
                         </h3>
 
@@ -191,9 +254,10 @@
                     </div>
 
 
+
                     <div class="dashboard-card">
 
-                        <h3>
+                        <h3 id="expensesLabel">
                             Total Expenses
                         </h3>
 
@@ -204,9 +268,10 @@
                     </div>
 
 
+
                     <div class="dashboard-card">
 
-                        <h3>
+                        <h3 id="profitLabel">
                             Profit
                         </h3>
 
@@ -217,9 +282,10 @@
                     </div>
 
 
+
                     <div class="dashboard-card">
 
-                        <h3>
+                        <h3 id="marginLabel">
                             Profit Margin
                         </h3>
 
@@ -229,9 +295,11 @@
 
                     </div>
 
+
                 </div>
 
             </section>
+
 
 
             <!-- =========================
@@ -282,6 +350,7 @@
                         </div>
 
 
+
                         <div class="form-group">
 
                             <label for="transactionCategory">
@@ -296,6 +365,7 @@
                             >
 
                         </div>
+
 
 
                         <div class="form-group">
@@ -316,6 +386,7 @@
                         </div>
 
 
+
                         <div class="form-group">
 
                             <label for="transactionDescription">
@@ -329,6 +400,7 @@
                             >
 
                         </div>
+
 
 
                         <div class="form-group">
@@ -346,6 +418,7 @@
                         </div>
 
 
+
                         <button
                             type="submit"
                             class="primary-button"
@@ -353,11 +426,13 @@
                             Add Transaction
                         </button>
 
+
                     </form>
 
                 </div>
 
             </section>
+
 
 
             <!-- =========================
@@ -419,6 +494,7 @@
             </section>
 
 
+
             <!-- =========================
                  BUSINESS ANALYTICS
             ========================== -->
@@ -442,13 +518,16 @@
 
                     <div class="chart-container">
 
-                        <canvas id="weeklyChart"></canvas>
+                        <canvas
+                            id="weeklyChart"
+                        ></canvas>
 
                     </div>
 
                 </div>
 
             </section>
+
 
 
             <!-- =========================
@@ -484,18 +563,25 @@
 
             </section>
 
+
         </main>
 
     </section>
 
 
+
     <!-- Chart.js -->
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
 
     <!-- Our JavaScript -->
 
     <script src="app.js"></script>
 
+
 </body>
+
 </html>

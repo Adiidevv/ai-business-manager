@@ -175,6 +175,40 @@ body {
 }
 
 /* =========================
+   TOTAL / TODAY SWITCH
+========================= */
+
+.summary-switch {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-view-button {
+    padding: 12px 28px;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    background: white;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.summary-view-button:hover {
+    border-color: #6366f1;
+    background: #f8fafc;
+}
+
+.summary-view-button.active {
+    background: #eef2ff;
+    border-color: #6366f1;
+    color: #111827;
+    font-weight: 700;
+}
+
+/* =========================
    DASHBOARD CARDS
 ========================= */
 
@@ -467,6 +501,17 @@ body {
 
     .transaction-card {
         overflow-x: auto;
+    }
+
+    /* Total / Today buttons on mobile */
+
+    .summary-switch {
+        gap: 10px;
+    }
+
+    .summary-view-button {
+        padding: 11px 22px;
+        font-size: 15px;
     }
 
 }
