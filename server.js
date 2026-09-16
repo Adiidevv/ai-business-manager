@@ -3,8 +3,6 @@ const db = require("./database");
 
 const app = express();
 
-// Render provides PORT.
-// 3000 is used when running locally.
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -63,45 +61,8 @@ app.post("/api/business", async (req, res) => {
         const cleanOwnerName = ownerName.trim();
 
 
+        // Always create a new business
         const result = await db.query(
-            `SELECT id FROM business LIMIT 1`
-        );
-
-
-        if (result.rows.length > 0) {
-
-            const businessId = result.rows[0].id;
-
-
-            await db.query(
-                `
-                UPDATE business
-                SET
-                    company_name = $1,
-                    business_type = $2,
-                    owner_name = $3
-                WHERE id = $4
-                `,
-                [
-                    cleanCompanyName,
-                    cleanBusinessType,
-                    cleanOwnerName,
-                    businessId
-                ]
-            );
-
-
-            return res.json({
-                message: "Business updated successfully.",
-                companyName: cleanCompanyName,
-                businessType: cleanBusinessType,
-                ownerName: cleanOwnerName
-            });
-
-        }
-
-
-        await db.query(
             `
             INSERT INTO business
             (
@@ -110,6 +71,7 @@ app.post("/api/business", async (req, res) => {
                 owner_name
             )
             VALUES ($1, $2, $3)
+            RETURNING id
             `,
             [
                 cleanCompanyName,
@@ -119,11 +81,21 @@ app.post("/api/business", async (req, res) => {
         );
 
 
+        const businessId = result.rows[0].id;
+
+
         res.json({
-            message: "Business saved successfully.",
+
+            message: "Business created successfully.",
+
+            businessId,
+
             companyName: cleanCompanyName,
+
             businessType: cleanBusinessType,
+
             ownerName: cleanOwnerName
+
         });
 
 
@@ -142,31 +114,34 @@ app.post("/api/business", async (req, res) => {
 
 
 // =========================
-// GET BUSINESS
+// GET BUSINESS BY ID
 // =========================
 
-app.get("/api/business", async (req, res) => {
+app.get("/api/business/:id", async (req, res) => {
 
     try {
+
+        const businessId = req.params.id;
+
 
         const result = await db.query(
             `
             SELECT
+                id,
                 company_name,
                 business_type,
                 owner_name
             FROM business
-            LIMIT 1
-            `
+            WHERE id = $1
+            `,
+            [businessId]
         );
 
 
         if (result.rows.length === 0) {
 
-            return res.json({
-                companyName: null,
-                businessType: null,
-                ownerName: null
+            return res.status(404).json({
+                error: "Business not found."
             });
 
         }
@@ -176,9 +151,15 @@ app.get("/api/business", async (req, res) => {
 
 
         res.json({
+
+            businessId: row.id,
+
             companyName: row.company_name,
+
             businessType: row.business_type,
+
             ownerName: row.owner_name
+
         });
 
 
@@ -205,6 +186,7 @@ app.post("/api/transactions", async (req, res) => {
     try {
 
         const {
+            businessId,
             type,
             category,
             amount,
@@ -214,6 +196,7 @@ app.post("/api/transactions", async (req, res) => {
 
 
         if (
+            !businessId ||
             !type ||
             !category ||
             !amount ||
@@ -222,7 +205,7 @@ app.post("/api/transactions", async (req, res) => {
 
             return res.status(400).json({
                 error:
-                    "Type, category, amount and date are required."
+                    "Business ID, type, category, amount and date are required."
             });
 
         }
@@ -232,16 +215,18 @@ app.post("/api/transactions", async (req, res) => {
             `
             INSERT INTO transactions
             (
+                business_id,
                 type,
                 category,
                 amount,
                 description,
                 date
             )
-            VALUES ($1, $2, $3, $4, $5)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING id
             `,
             [
+                businessId,
                 type,
                 category,
                 amount,
@@ -252,8 +237,13 @@ app.post("/api/transactions", async (req, res) => {
 
 
         res.json({
-            message: "Transaction added successfully.",
-            transactionId: result.rows[0].id
+
+            message:
+                "Transaction added successfully.",
+
+            transactionId:
+                result.rows[0].id
+
         });
 
 
@@ -272,19 +262,24 @@ app.post("/api/transactions", async (req, res) => {
 
 
 // =========================
-// GET ALL TRANSACTIONS
+// GET TRANSACTIONS
 // =========================
 
-app.get("/api/transactions", async (req, res) => {
+app.get("/api/transactions/:businessId", async (req, res) => {
 
     try {
+
+        const businessId = req.params.businessId;
+
 
         const result = await db.query(
             `
             SELECT *
             FROM transactions
+            WHERE business_id = $1
             ORDER BY id DESC
-            `
+            `,
+            [businessId]
         );
 
 
@@ -361,9 +356,12 @@ app.delete(
 // BUSINESS SUMMARY
 // =========================
 
-app.get("/api/summary", async (req, res) => {
+app.get("/api/summary/:businessId", async (req, res) => {
 
     try {
+
+        const businessId = req.params.businessId;
+
 
         const result = await db.query(
             `
@@ -393,7 +391,10 @@ app.get("/api/summary", async (req, res) => {
                 ) AS expenses
 
             FROM transactions
-            `
+
+            WHERE business_id = $1
+            `,
+            [businessId]
         );
 
 
@@ -423,8 +424,11 @@ app.get("/api/summary", async (req, res) => {
         res.json({
 
             income,
+
             expenses,
+
             profit,
+
             profitMargin
 
         });
@@ -449,10 +453,14 @@ app.get("/api/summary", async (req, res) => {
 // =========================
 
 app.get(
-    "/api/analytics/weekly",
+    "/api/analytics/weekly/:businessId",
     async (req, res) => {
 
         try {
+
+            const businessId =
+                req.params.businessId;
+
 
             const result = await db.query(
                 `
@@ -486,7 +494,9 @@ app.get(
 
                 FROM transactions
 
-                WHERE date >=
+                WHERE business_id = $1
+
+                AND date >=
                     TO_CHAR(
                         CURRENT_DATE - INTERVAL '6 days',
                         'YYYY-MM-DD'
@@ -495,7 +505,8 @@ app.get(
                 GROUP BY date
 
                 ORDER BY date ASC
-                `
+                `,
+                [businessId]
             );
 
 
