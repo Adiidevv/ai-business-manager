@@ -23,6 +23,54 @@
 <body>
 
 
+    <!-- ACCOUNT ACCESS -->
+    <section id="authPage" class="setup-page auth-page" style="display:none;">
+        <div class="setup-card auth-card">
+            <h1>🤖 AI Business Manager</h1>
+            <p class="setup-subtitle">Your business workspace, secured.</p>
+
+            <div class="auth-switch">
+                <button id="showLoginButton" type="button" class="summary-view-button active">Sign in</button>
+                <button id="showRegisterButton" type="button" class="summary-view-button">Create account</button>
+            </div>
+
+            <p id="authMessage" class="setup-message" role="alert" aria-live="polite"></p>
+
+            <div id="loginPanel">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email address</label>
+                        <input id="loginEmail" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+                    </div>
+                    <button class="next-button" type="submit">Sign in</button>
+                </form>
+            </div>
+
+            <div id="registerPanel" style="display:none;">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName">Your name</label>
+                        <input id="registerName" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email address</label>
+                        <input id="registerEmail" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password (at least 10 characters)</label>
+                        <input id="registerPassword" name="password" type="password" autocomplete="new-password" required minlength="10" maxlength="200" placeholder="Create a strong password">
+                    </div>
+                    <button class="next-button" type="submit">Create account</button>
+                </form>
+            </div>
+            <p class="auth-footnote">Your password is stored as a secure hash, never as plain text.</p>
+        </div>
+    </section>
+
     <!-- =========================
          BUSINESS SETUP PAGE
     ========================== -->
@@ -178,6 +226,7 @@
                 </p>
 
             </div>
+            <button id="logoutButton" class="logout-button" type="button">Sign out</button>
 
         </header>
 
@@ -580,6 +629,7 @@
     <!-- Our JavaScript -->
 
     <script src="app.js"></script>
+    <script src="workspaces.js"></script>
 
 
 </body>
